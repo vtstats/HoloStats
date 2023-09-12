@@ -3,7 +3,14 @@ import { MatIconRegistry } from "@angular/material/icon";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { DomSanitizer } from "@angular/platform-browser";
 import { RouterModule } from "@angular/router";
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from "@angular/material/dialog";
+import { MatButtonModule } from "@angular/material/button";
 import { fromEvent, map, startWith, throttleTime } from "rxjs";
+import qs from "query-string";
 
 import { Header } from "./layout/header/header";
 import { Sidenav } from "./layout/sidenav/sidenav";
@@ -113,7 +120,7 @@ const icons: Array<[string, string]> = [
 
 @Component({
   standalone: true,
-  imports: [Header, Sidenav, RouterModule, MatSidenavModule],
+  imports: [Header, Sidenav, RouterModule, MatDialogModule, MatSidenavModule],
   selector: "hls-root",
   templateUrl: "app.component.html",
 })
@@ -123,6 +130,7 @@ export class AppComponent implements OnInit {
 
   private iconRegistry = inject(MatIconRegistry);
   private sanitizer = inject(DomSanitizer);
+  private dialog = inject(MatDialog);
 
   constructor() {
     for (const [name, svg] of icons) {
@@ -143,10 +151,235 @@ export class AppComponent implements OnInit {
         )
         .subscribe((width) => this.updateSidenav(width));
     }
+
+    this.dialog.open(MigrationDialog);
+  }
+
+  open() {
+    this.dialog.open(MigrationDialog);
   }
 
   updateSidenav(width: number) {
     this.sidenavShouldOpen = width > 1200;
     this.sidenavMode = width > 1200 ? "side" : "over";
+  }
+}
+
+@Component({
+  standalone: true,
+  selector: "migration-dialog",
+  template: `
+    <h1 mat-dialog-title>Introducing vtstats</h1>
+    <div mat-dialog-content>
+      <p class="mat-headline-6">
+        TLDR: HoloStats is now superseded by
+        <a class="text-inherit" href="https://vt.poi.cat">vtstats</a> and will
+        be shut down by the end of October.
+      </p>
+
+      <p>
+        Hello everyone, I'm PoiScript, the maintainer of HoloStats. Today, I'm
+        extremely excited to introduce
+        <a class="text-inherit" href="https://vt.poi.cat">vtstats</a>, the
+        successor to HoloStats.
+      </p>
+
+      <p>
+        Like the name suggests, vtstats will not be limited to Hololive members
+        any more.
+        <b
+          >Vtubers from other company (e.g. Nijisanji, VShojo) are also
+          supported</b
+        >. Currently vtstats has already supported more than <i>250</i> vtubers
+        and counting.
+      </p>
+
+      <p>Moreover, vtstats brings some cool new features, including:</p>
+
+      <ul>
+        <li>
+          Revenue page, which calculates the all-time earnings for vtubers.
+        </li>
+        <li>Full-text search for stream with synonym support.</li>
+        <li>Receive stream update notifications from discord bot.</li>
+        <li>Twitch channels / streams support.</li>
+        <li>Some ux improvements and bug fixes</li>
+      </ul>
+
+      <p>
+        As always, vtstats will continue to be an <b>open-source project</b>.
+        You can the source code in the new
+        <a
+          class="text-inherit"
+          target="_blank"
+          href="https://github.com/vtstats"
+          >GitHub organization</a
+        >. Pull requests are always welcome.
+      </p>
+
+      <p>
+        Also, I have created a
+        <a class="text-inherit" href="https://discord.gg/wZCj9hrh"
+          >Discord channel</a
+        >. So, if you encounter any issues that you'd like to report or have any
+        suggestions to share, don't hesitate to jump in the channel and ping me.
+      </p>
+
+      <p>
+        For those who have donated me in BuyMeACoffee, I really appreciate your
+        support. Please feel free to DM me in discord to ask for the
+        <b>Donator</b>
+        role.
+      </p>
+
+      <p>
+        Since all data from HoloStats has been migrated to vtstats now, there's
+        no need to keep both websites running. I plan to
+        <b>shut down the HoloStats website by the end of October</b>. Starting
+        from November, all requests sent to HoloStats will be redirected to
+        vtstats.
+      </p>
+
+      <p>
+        Finally, I want to express my gratitude to all of you for supporting
+        this project. I hope you enjoy vtubers, and I'll see you on vtstats.
+      </p>
+
+      <p>- poi</p>
+    </div>
+
+    <div [align]="'end'" mat-dialog-actions>
+      <button mat-button (click)="close()">Close</button>
+      <button mat-button color="primary" (click)="takeMe()" cdkFocusInitial>
+        Take me to vtstats
+      </button>
+    </div>
+  `,
+  imports: [MatDialogModule, MatButtonModule],
+})
+export class MigrationDialog {
+  public dialogRef = inject(MatDialogRef);
+
+  takeMe() {
+    const mappings = {
+      hololive: "hololive-official",
+      hololive_en: "hololive-en-official",
+      hololive_id: "hololive-id-official",
+      sora: "sorahoshi-kirame",
+      miko: "rindou-mikoto",
+      suisei: "hoshimachi-suisei",
+      fubuki: "shirakami-fubuki",
+      matsuri: "natsuiro-matsuri",
+      haato: "akai-haato",
+      aki: "aki-rosenthal",
+      mel: "yozora-mel",
+      choco: "yuzuki-choco",
+      shion: "murasaki-shion",
+      aqua: "minato-aqua",
+      subaru: "oozora-subaru",
+      ayame: "nakiri-ayame",
+      pekora: "usada-pekora",
+      rushia: "uruha-rushia",
+      flare: "shiranui-flare",
+      marine: "houshou-marine",
+      noel: "shirogane-noel",
+      kanata: "amane-kanata",
+      coco: "kiryu-coco",
+      watame: "tsunomaki-watame",
+      towa: "tokoyami-towa",
+      himemoriluna: "himemori-luna",
+      lamy: "yukihana-lamy",
+      nene: "momosuzu-nene",
+      botan: "shishiro-botan",
+      polka: "omaru-polka",
+      laplus: "laplus-darkness",
+      lui: "takane-lui",
+      koyori: "hakui-koyori",
+      chloe: "sakamata-chloe",
+      iroha: "kazama-iroha",
+      mio: "ookami-mio",
+      okayu: "nekomata-okayu",
+      korone: "inugami-korone",
+      risu: "ayunda-risu",
+      moona: "moona-hoshinova",
+      iofi: "airani-iofifteen",
+      ollie: "kureiji-ollie",
+      melfissa: "anya-melfissa",
+      reine: "pavolia-reine",
+      vestia: "vestia-zeta",
+      kaela: "kaela-kovalskia",
+      kobo: "kobo-kanaeru",
+      amelia: "watson-amelia",
+      calliope: "mori-calliope",
+      gura: "gawr-gura",
+      inanis: "ninomae-inanis",
+      kiara: "takanashi-kiara",
+      sana: "tsukumo-sana",
+      ceres: "ceres-fauna",
+      ouro: "ouro-kronii",
+      mumei: "nanashi-mumei",
+      hakos: "hakos-baelz",
+      koseki_bijou: "koseki-bijou",
+      shiori_novella: "shiori-novella",
+      nerissa_ravencroft: "nerissa-ravencroft",
+      miyabi: "hanasaki-miyabi",
+      izuru: "kanade-izuru",
+      aruran: "arurandeisu",
+      rikka: "rikka",
+      astel: "astel-leda",
+      temma: "kishido-temma",
+      roberu: "yukoku-roberu",
+      shien: "kageyama-shien",
+      oga: "aragami-oga",
+      fuma: "yatogami-fuma",
+      uyu: "utsugi-uyu",
+      gamma: "hizaki-gamma",
+      rio: "minase-rio",
+      regis_altare: "regis-altare",
+      magni_dezmond: "magni-dezmond",
+      axel_syrios: "axel-syrios",
+      noir_vesper: "axel-syrios",
+      ayamy: "ayamy",
+      nabi: "aoi-nabi",
+      pochimaru: "pochimaru",
+      nana: "kagura-nana",
+      ui: "shigure-ui",
+      luna: "kaguya-luna",
+      nekomiya: "nekomiya-hinata",
+      tamaki: "inuyama-tamaki",
+
+      gavis_bettel: null,
+      machina_x_flayon: null,
+      banzoin_hakka: null,
+      josuiji_shinri: null,
+    };
+
+    const query = {
+      tz: localStorage.getItem("timezone"),
+      l: localStorage.getItem("lang"),
+      v: (localStorage.getItem("vtuber") || "")
+        .split(",")
+        .map((id) => mappings[id]),
+      c: localStorage.getItem("vts:currencySetting")
+        ? JSON.parse(localStorage.getItem("vts:currencySetting"))
+        : undefined,
+      t: localStorage.getItem("vts:themeSetting")
+        ? JSON.parse(localStorage.getItem("vts:themeSetting"))
+        : undefined,
+      n: localStorage.getItem("vts:nameSetting")
+        ? JSON.parse(localStorage.getItem("vts:nameSetting"))
+        : undefined,
+    };
+
+    window.location.replace(
+      qs.stringifyUrl(
+        { url: "http://vt.poi.cat/hls-migrate", query },
+        { arrayFormat: "comma" }
+      )
+    );
+  }
+
+  close(): void {
+    this.dialogRef.close();
   }
 }
