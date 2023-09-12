@@ -51,5 +51,6 @@
     "ts-node": "^9.1.1",
     "tslint": "~6.1.0",
     "typescript": "~5.0.4"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }
