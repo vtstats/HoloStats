@@ -11,7 +11,7 @@ import {
 import { MatButtonModule } from "@angular/material/button";
 import { fromEvent, map, startWith, throttleTime } from "rxjs";
 import qs from "query-string";
-import { vtubers } from "../../vtubers.json";
+import vtubers from "../../vtubers.json";
 
 import { Header } from "./layout/header/header";
 import { Sidenav } from "./layout/sidenav/sidenav";
@@ -152,12 +152,12 @@ export class AppComponent implements OnInit {
           map(() => window.innerWidth)
         )
         .subscribe((width) => this.updateSidenav(width));
-    }
 
-    const value = window.localStorage.getItem("remindMeLater");
-    const n = Number.parseInt(value);
-    if (Number.isNaN(n) || n < new Date().getTime()) {
-      this.dialog.open(MigrationDialog);
+      const value = window.localStorage.getItem("remindMeLater");
+      const n = Number.parseInt(value);
+      if (Number.isNaN(n) || n < new Date().getTime()) {
+        this.dialog.open(MigrationDialog);
+      }
     }
   }
 
@@ -533,7 +533,7 @@ export class MigrationDialog {
       l: localStorage.getItem("lang"),
       v: (localStorage.getItem("vtuber")
         ? localStorage.getItem("vtuber").split(",")
-        : vtubers.filter((v) => v.default).map((v) => v.id)
+        : vtubers.vtubers.filter((v) => v.default).map((v) => v.id)
       ).map((id) => mappings[id]),
       c: localStorage.getItem("vts:currencySetting")
         ? JSON.parse(localStorage.getItem("vts:currencySetting"))
