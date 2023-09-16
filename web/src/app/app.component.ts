@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, signal } from "@angular/core";
 import { MatIconRegistry } from "@angular/material/icon";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -11,9 +11,11 @@ import {
 import { MatButtonModule } from "@angular/material/button";
 import { fromEvent, map, startWith, throttleTime } from "rxjs";
 import qs from "query-string";
+import { vtubers } from "../../vtubers.json";
 
 import { Header } from "./layout/header/header";
 import { Sidenav } from "./layout/sidenav/sidenav";
+import { CommonModule } from "@angular/common";
 
 const icons: Array<[string, string]> = [
   [
@@ -152,7 +154,11 @@ export class AppComponent implements OnInit {
         .subscribe((width) => this.updateSidenav(width));
     }
 
-    this.dialog.open(MigrationDialog);
+    const value = window.localStorage.getItem("remindMeLater");
+    const n = Number.parseInt(value);
+    if (Number.isNaN(n) || n < new Date().getTime()) {
+      this.dialog.open(MigrationDialog);
+    }
   }
 
   open() {
@@ -169,98 +175,267 @@ export class AppComponent implements OnInit {
   standalone: true,
   selector: "migration-dialog",
   template: `
-    <h1 mat-dialog-title>Introducing vtstats</h1>
+    <h1 mat-dialog-title>HoloStats is now superseded by vtstats</h1>
     <div mat-dialog-content>
-      <p class="mat-headline-6">
-        TLDR: HoloStats is now superseded by
-        <a class="text-inherit" href="https://vt.poi.cat">vtstats</a> and will
-        be shut down by the end of October.
-      </p>
+      <div class="mb-4">
+        <span
+          class="mr-2 cursor-pointer"
+          [class.underline]="locale === 'en'"
+          (click)="locale = 'en'"
+          >English</span
+        >
 
-      <p>
-        Hello everyone, I'm PoiScript, the maintainer of HoloStats. Today, I'm
-        extremely excited to introduce
-        <a class="text-inherit" href="https://vt.poi.cat">vtstats</a>, the
-        successor to HoloStats.
-      </p>
+        <span
+          class="mr-2 cursor-pointer"
+          [class.underline]="locale === 'ja'"
+          (click)="locale = 'ja'"
+          >日本語</span
+        >
 
-      <p>
-        Like the name suggests, vtstats will not be limited to Hololive members
-        any more.
-        <b
-          >Vtubers from other company (e.g. Nijisanji, VShojo) are also
-          supported</b
-        >. Currently vtstats has already supported more than <i>250</i> vtubers
-        and counting.
-      </p>
+        <span
+          class="mr-2 cursor-pointer"
+          [class.underline]="locale === 'zh'"
+          (click)="locale = 'zh'"
+          >中文</span
+        >
+      </div>
 
-      <p>Moreover, vtstats brings some cool new features, including:</p>
+      <ng-container *ngIf="locale === 'en'">
+        <p class="mat-headline-6">
+          TLDR: HoloStats is now superseded by
+          <a class="text-inherit" [attr.href]="link">vtstats</a> and will be
+          shut down by the end of October.
+        </p>
 
-      <ul>
-        <li>
-          Revenue page, which calculates the all-time earnings for vtubers.
-        </li>
-        <li>Full-text search for stream with synonym support.</li>
-        <li>Receive stream update notifications from discord bot.</li>
-        <li>Twitch channels / streams support.</li>
-        <li>Some ux improvements and bug fixes</li>
-      </ul>
+        <p>
+          Hello everyone, I'm PoiScript, the maintainer of HoloStats. Today, I'm
+          extremely excited to introduce
+          <a class="text-inherit" [attr.href]="link">vtstats</a>, the successor
+          to HoloStats.
+        </p>
 
-      <p>
-        As always, vtstats will continue to be an <b>open-source project</b>.
-        You can the source code in the new
-        <a
-          class="text-inherit"
-          target="_blank"
-          href="https://github.com/vtstats"
-          >GitHub organization</a
-        >. Pull requests are always welcome.
-      </p>
+        <p>
+          Like the name suggests, vtstats will not be limited to Hololive
+          members any more.
+          <b
+            >Vtubers from other company (e.g. Nijisanji, VShojo) are also
+            supported</b
+          >. Currently vtstats has already supported more than
+          <i>250</i> vtubers and counting.
+        </p>
 
-      <p>
-        Also, I have created a
-        <a class="text-inherit" href="https://discord.gg/wZCj9hrh"
-          >Discord channel</a
-        >. So, if you encounter any issues that you'd like to report or have any
-        suggestions to share, don't hesitate to jump in the channel and ping me.
-      </p>
+        <p>Moreover, vtstats brings some cool new features, including:</p>
 
-      <p>
-        For those who have donated me in BuyMeACoffee, I really appreciate your
-        support. Please feel free to DM me in discord to ask for the
-        <b>Donator</b>
-        role.
-      </p>
+        <ul>
+          <li>
+            Revenue page, which calculates the all-time earnings for vtubers.
+          </li>
+          <li>Full-text search for stream with synonym support.</li>
+          <li>Receive stream update notifications from discord bot.</li>
+          <li>Twitch channels / streams support.</li>
+          <li>Some ux improvements and bug fixes</li>
+        </ul>
 
-      <p>
-        Since all data from HoloStats has been migrated to vtstats now, there's
-        no need to keep both websites running. I plan to
-        <b>shut down the HoloStats website by the end of October</b>. Starting
-        from November, all requests sent to HoloStats will be redirected to
-        vtstats.
-      </p>
+        <p>
+          As always, vtstats will continue to be an <b>open-source project</b>.
+          You can the source code in the new
+          <a
+            class="text-inherit"
+            target="_blank"
+            href="https://github.com/vtstats"
+            >GitHub organization</a
+          >. Pull requests are always welcome.
+        </p>
 
-      <p>
-        Finally, I want to express my gratitude to all of you for supporting
-        this project. I hope you enjoy vtubers, and I'll see you on vtstats.
-      </p>
+        <p>
+          Also, I have created a
+          <a class="text-inherit" href="https://discord.gg/wZCj9hrh"
+            >Discord channel</a
+          >. So, if you encounter any issues that you'd like to report or have
+          any suggestions to share, don't hesitate to jump in the channel and
+          ping me.
+        </p>
 
-      <p>- poi</p>
+        <p>
+          For those who have donated me in BuyMeACoffee, I really appreciate
+          your support. Please feel free to DM me in discord to ask for the
+          <b>Donator</b>
+          role.
+        </p>
+
+        <p>
+          Since all data from HoloStats has been migrated to vtstats now,
+          there's no need to keep both websites running. I plan to
+          <b>shut down the HoloStats website by the end of October</b>. Starting
+          from November, all requests sent to HoloStats will be redirected to
+          vtstats.
+        </p>
+
+        <p>
+          Finally, I want to express my gratitude to all of you for supporting
+          this project. I hope you enjoy vtubers, and I'll see you on vtstats.
+        </p>
+
+        <p>- poi</p>
+      </ng-container>
+
+      <ng-container *ngIf="locale === 'ja'">
+        <p>(Translated by DeepL)</p>
+
+        <p class="mat-headline-6">
+          TLDR: HoloStats は
+          <a class="text-inherit" [attr.href]="link">vtstats</a>
+          に取って代わられ、10月末までに閉鎖されます。
+        </p>
+
+        <p>
+          HoloStats のメンテナ、PoiScript です。今日は、HoloStats の後継となる
+          <a class="text-inherit" [attr.href]="link">vtstats</a>
+          をご紹介できることを大変嬉しく思います。
+        </p>
+
+        <p>
+          その名の通り、vtstats はもう Hololive
+          メンバーに限定されません。他社（にじさんじ、VShojoなど）のVtuberもサポートします。現在、vtstatsはすでに250人以上のVtuberをサポートしています。
+        </p>
+
+        <p>さらに、vtstats は以下のようなクールな新機能を提供します：</p>
+
+        <ul>
+          <li>vtuber の歴代収益を計算する収益ページ。</li>
+          <li>同義語をサポートしたストリームの全文検索。</li>
+          <li>discord bot からストリーム更新通知を受信。</li>
+          <li>Twitch チャンネル/ストリームのサポート。</li>
+          <li>いくつかの ux の改善とバグ修正</li>
+        </ul>
+
+        <p>
+          これまで通り、vtstatsはオープンソースプロジェクトであり続けます。ソースコードは新しい
+          <a
+            class="text-inherit"
+            target="_blank"
+            href="https://github.com/vtstats"
+            >GitHub organization</a
+          >
+          でご覧いただけます。プルリクエストはいつでも歓迎です。
+        </p>
+
+        <p>
+          また、<a class="text-inherit" href="https://discord.gg/wZCj9hrh"
+            >Discord
+          </a>
+          チャンネルも作りました。もし報告したい問題があったり、共有したい提案があれば、遠慮なくチャンネルに飛び込んで私に
+          ping を送ってほしい。
+        </p>
+
+        <p>
+          BuyMeACoffee
+          で私に寄付をしてくださった方々、本当にありがとうございます。Discord
+          で私に DM を送り、Donator の role をお願いしてください。
+        </p>
+
+        <p>
+          HoloStats のデータはすべて vtstats
+          に移行したので、両方のウェブサイトを運営し続ける必要はない。10月末までに
+          HoloStats のウェブサイトを閉鎖する予定です。11 月からは、HoloStats
+          に送られたリクエストはすべて vtstats にリダイレクトされます。
+        </p>
+
+        <p>
+          最後に、このプロジェクトを応援してくださる皆さんに感謝の気持ちを伝えたいと思います。また
+          vtstats でお会いしましょう。
+        </p>
+
+        <p>- poi</p>
+      </ng-container>
+
+      <ng-container *ngIf="locale === 'zh'">
+        <p>(Translated by DeepL)</p>
+
+        <p class="mat-headline-6">
+          TLDR: HoloStats 现已被
+          <a class="text-inherit" [attr.href]="link">vtstats</a>
+          取代，并将于十月底关闭。
+        </p>
+
+        <p>
+          大家好，我是 HoloStats 的維護者
+          PoiScript。今天，我非常興奮地介紹新項目
+          <a class="text-inherit" [attr.href]="link">vtstats</a>。
+        </p>
+
+        <p>
+          正如名稱所示，vtstats 將不再僅限於記錄 Hololive 成員。它還支持其他
+          VTuber（例如 Nijisanji、VShojo 等）。目前， vtstats 已經支持了250多位
+          VTuber ，並且還在不斷增加中。
+        </p>
+
+        <p>此外，vtstats 還帶來了一些很酷的新功能，包括：</p>
+
+        <ul>
+          <li>查看 VTuber 的頻道的歷史收益</li>
+          <li>全文搜索功能</li>
+          <li>從 Discord 機器人接收流更新通知。</li>
+          <li>支持 Twitch 頻道合直播</li>
+          <li>一些 UX 改進和 Bug 修復</li>
+        </ul>
+
+        <p>
+          和往常一樣，vtstats將繼續是一個開源項目。您可以在新的<a
+            class="text-inherit"
+            target="_blank"
+            href="https://github.com/vtstats"
+            >GitHub organization</a
+          >中找到源代碼，我們歡迎 Pull Requests。
+        </p>
+
+        <p>
+          此外，我已經創建了一個
+          <a class="text-inherit" href="https://discord.gg/wZCj9hrh"
+            >Discord channel</a
+          >。因此，如果您遇到任何問題要報告，或者有任何建議要分享，請隨時加入該頻道並提及我。
+        </p>
+
+        <p>
+          對於那些在 BuyMeACoffee 捐贈給我的人，我真的非常感激您的支持。你可以在
+          Discord 中给我發送 DM 以获取 Donator 的 Role。
+        </p>
+
+        <p>
+          由於 HoloStats 的所有數據現在都已遷移到
+          vtstats，因此不再需要保持兩個網站運行。我計劃在十月底前關閉 HoloStats
+          網站。從十一月開始，發送到 HoloStats 的所有請求將被重定向到 vtstats。
+        </p>
+
+        <p>
+          最后，我想對所有支持這個項目的人表示感謝。我希望您享受 VTuber
+          带来的乐趣，我們將在 vtstats 上見面。
+        </p>
+
+        <p>-- poi</p>
+      </ng-container>
     </div>
 
     <div [align]="'end'" mat-dialog-actions>
-      <button mat-button (click)="close()">Close</button>
-      <button mat-button color="primary" (click)="takeMe()" cdkFocusInitial>
+      <button mat-button (click)="close()">Remind me later</button>
+      <a mat-button color="primary" [attr.href]="link" cdkFocusInitial>
         Take me to vtstats
-      </button>
+      </a>
     </div>
   `,
-  imports: [MatDialogModule, MatButtonModule],
+  imports: [MatDialogModule, MatButtonModule, CommonModule],
 })
 export class MigrationDialog {
   public dialogRef = inject(MatDialogRef);
 
+  locale = "en";
+  link = "http://vt.poi.cat/hls-migrate";
+
   takeMe() {
+    window.location.replace(this.link);
+  }
+
+  constructor() {
     const mappings = {
       hololive: "hololive-official",
       hololive_en: "hololive-en-official",
@@ -347,19 +522,19 @@ export class MigrationDialog {
       luna: "kaguya-luna",
       nekomiya: "nekomiya-hinata",
       tamaki: "inuyama-tamaki",
-
-      gavis_bettel: null,
-      machina_x_flayon: null,
-      banzoin_hakka: null,
-      josuiji_shinri: null,
+      gavis_bettel: "gavis-bettel",
+      machina_x_flayon: "machina-x-flayon",
+      banzoin_hakka: "banzoin-hakka",
+      josuiji_shinri: "josuiji-shinri",
     };
 
     const query = {
       tz: localStorage.getItem("timezone"),
       l: localStorage.getItem("lang"),
-      v: (localStorage.getItem("vtuber") || "")
-        .split(",")
-        .map((id) => mappings[id]),
+      v: (localStorage.getItem("vtuber")
+        ? localStorage.getItem("vtuber").split(",")
+        : vtubers.filter((v) => v.default).map((v) => v.id)
+      ).map((id) => mappings[id]),
       c: localStorage.getItem("vts:currencySetting")
         ? JSON.parse(localStorage.getItem("vts:currencySetting"))
         : undefined,
@@ -371,15 +546,17 @@ export class MigrationDialog {
         : undefined,
     };
 
-    window.location.replace(
-      qs.stringifyUrl(
-        { url: "http://vt.poi.cat/hls-migrate", query },
-        { arrayFormat: "comma" }
-      )
+    this.link = qs.stringifyUrl(
+      { url: "http://vt.poi.cat/hls-migrate", query },
+      { arrayFormat: "comma" }
     );
   }
 
   close(): void {
+    window.localStorage.setItem(
+      "remindMeLater",
+      String(new Date().getTime() + 3 * 24 * 60 * 60 * 1000) // 3 day later
+    );
     this.dialogRef.close();
   }
 }
