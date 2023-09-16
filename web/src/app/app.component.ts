@@ -249,7 +249,7 @@ export class AppComponent implements OnInit {
 
         <p>
           Also, I have created a
-          <a class="text-inherit" href="https://discord.gg/wZCj9hrh"
+          <a class="text-inherit" href="https://discord.gg/m9NwUzKbkK"
             >Discord channel</a
           >. So, if you encounter any issues that you'd like to report or have
           any suggestions to share, don't hesitate to jump in the channel and
@@ -321,7 +321,7 @@ export class AppComponent implements OnInit {
         </p>
 
         <p>
-          また、<a class="text-inherit" href="https://discord.gg/wZCj9hrh"
+          また、<a class="text-inherit" href="https://discord.gg/m9NwUzKbkK"
             >Discord
           </a>
           チャンネルも作りました。もし報告したい問題があったり、共有したい提案があれば、遠慮なくチャンネルに飛び込んで私に
@@ -391,7 +391,7 @@ export class AppComponent implements OnInit {
 
         <p>
           此外，我已經創建了一個
-          <a class="text-inherit" href="https://discord.gg/wZCj9hrh"
+          <a class="text-inherit" href="https://discord.gg/m9NwUzKbkK"
             >Discord channel</a
           >。因此，如果您遇到任何問題要報告，或者有任何建議要分享，請隨時加入該頻道並提及我。
         </p>
